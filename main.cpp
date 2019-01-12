@@ -24,12 +24,12 @@
 #define NUMBER_BULLETS 1
 #define NUMBER_BADGUY 10
 #define NUMBER_COMET 10
-#define SCALE_FACTOR 4
+#define SCALE_FACTOR 10
 #define width 600
 #define height 900
 #define SCALED_WIDTH (width/SCALE_FACTOR)
 #define SCALED_HEIGHT (height/SCALE_FACTOR)
-#define FPS 60
+#define FPS 6000
 
 
 
@@ -156,7 +156,8 @@ int main(int argc, char *argv[]) {
     al_register_event_source(event_queue,al_get_timer_event_source(timerfps));
         
     al_start_timer(timerfps);
-    GameTime = al_current_time(); 
+    GameTime = al_current_time();
+   int totalf=0; 
     while(!Done){       
         al_wait_for_event(event_queue,&event);
 
@@ -165,12 +166,29 @@ int main(int argc, char *argv[]) {
             FireBullet(bullet,NUMBER_BULLETS,ship);
             //UPDATE FPS
             Frames++;
+	    totalf++;
             if(al_current_time() - GameTime >= 1){
                 GameTime = al_current_time();
                 GameFPS = Frames;
                 Frames = 0;
+		printf("FPS: %d\n",GameFPS);
+		printf("Score: %d HP: %d\n",ship.score,ship.lives);
 	    }
-            //SHOW MEMORY
+            if(!((totalf>>3)&0x1)){ //16f
+		    int act=rand()%3;
+		    if(act==0){
+			    left=false;
+			    right=false;
+		    }
+		    else if(act==1){
+			    left=false;
+			    right=true;
+		    }
+		    else if(act==2){
+			    left=true;
+			    right=false;
+		    }
+	    }
 
             //GAME STATE
             if(state == PLAYING){
@@ -192,12 +210,17 @@ int main(int argc, char *argv[]) {
                     CollideComet(comets, NUMBER_COMET, ship);
                 }
             }else if(state == GAMEOVER){
-                if(keys[SPACE])
-                    Done = true;
+		    printf("Alive for %d frames. Score: %d\n",totalf,ship.score);
+		    totalf=0;
+		    InitShip(ship);
+		    InitBullet(bullet,NUMBER_BULLETS);
+		    InitComet(comets,NUMBER_COMET);
+		    state=PLAYING;
             }
         }else if(event.type == ALLEGRO_EVENT_DISPLAY_CLOSE){
             Done = true;    
-        }/*else if(event.type == ALLEGRO_EVENT_KEY_DOWN){
+        }
+	/*else if(event.type == ALLEGRO_EVENT_KEY_DOWN){
             switch(event.keyboard.keycode){
                 case ALLEGRO_KEY_ESCAPE:
                     keys[ESCAPE] = true;
