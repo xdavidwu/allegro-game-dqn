@@ -21,7 +21,7 @@
 #include "object.h"
 
 #define GAME_TERMINATE 666
-#define NUMBER_BULLETS 10
+#define NUMBER_BULLETS 1
 #define NUMBER_BADGUY 10
 #define NUMBER_COMET 10
 #define SCALE_FACTOR 4
@@ -154,8 +154,7 @@ int main(int argc, char *argv[]) {
     al_register_event_source(event_queue,al_get_display_event_source(display));
     //al_register_event_source(event_queue,al_get_keyboard_event_source());
     al_register_event_source(event_queue,al_get_timer_event_source(timerfps));
-    al_register_event_source(event_queue,al_get_timer_event_source(timerflip));
-    
+        
     al_start_timer(timerfps);
     GameTime = al_current_time(); 
     while(!Done){       
@@ -163,7 +162,7 @@ int main(int argc, char *argv[]) {
 
         if(event.type == ALLEGRO_EVENT_TIMER){
             redraw = true;
-
+            FireBullet(bullet,NUMBER_BULLETS,ship);
             //UPDATE FPS
             Frames++;
             if(al_current_time() - GameTime >= 1){
@@ -185,6 +184,7 @@ int main(int argc, char *argv[]) {
                         MoveRight(ship);
                     if(keys[SPACE]){
                     }
+                    
                     UpdateBullet(bullet, NUMBER_BULLETS);
                     StartComet(comets, NUMBER_COMET);
                     UpdateComet(comets, NUMBER_COMET);
@@ -230,7 +230,6 @@ int main(int argc, char *argv[]) {
                     break;
                 case ALLEGRO_KEY_SPACE:
                     keys[SPACE] = false;
-                    FireBullet(bullet,NUMBER_BULLETS,ship);
                     break;
             }
         }*/
