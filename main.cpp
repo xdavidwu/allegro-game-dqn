@@ -39,6 +39,9 @@ bool Game_Over = false;
 int ImageRad = 2;
 int ImageWidth, ImageHigh;
 int state = MENU;
+bool stop;
+bool right;
+bool left;
 
 //announce function for game base
 void ConsoleLog(int &state, int newSate);
@@ -88,7 +91,7 @@ ALLEGRO_FONT* font_monaco_25px = NULL;
 ALLEGRO_BITMAP* plane = NULL;
 ALLEGRO_BITMAP* get_screen = NULL;
 
-/*unsigned char *getbitmap(){
+unsigned char *getbitmap(){
     ALLEGRO_BITMAP *scr=al_get_target_bitmap();
     unsigned char *map=(unsigned char *)malloc(sizeof(unsigned char)*width*height*3);
     for (int i=0;i<width;i++) for(int j=0;j<height;j++){
@@ -96,7 +99,7 @@ ALLEGRO_BITMAP* get_screen = NULL;
         al_unmap_rgb(c,&map[i*width*3+j*3],&map[i*width*3+j*3+1],&map[i*width*3+j*3+2]);
     }
     return map;
-}*/
+}
 //MAIN FUNCTION
 int main(int argc, char *argv[]) {
     printf("[%s:%s] \n",__FILE__,__DATE__);
@@ -166,22 +169,14 @@ int main(int argc, char *argv[]) {
 
 
             //GAME STATE
-            if(state == MENU){
-                if(keys[SPACE]){
-                    state = PLAYING;
-                }
-            }else if(state == PLAYING){
+            if(state == PLAYING){
                 //getbitmap();
                 if(keys[ESCAPE]) state = GAMEOVER;
                 else if(ship.lives <= 0) state = GAMEOVER;
                 else{
-                    if(keys[UP])
-                        MoveUp(ship);
-                    if(keys[DOWN])
-                        MoveDown(ship);
-                    if(keys[LEFT])
+                    if(left)
                         MoveLeft(ship);
-                    if(keys[RIGHT])
+                    if(right)
                         MoveRight(ship);
                     if(keys[SPACE]){
                     }
@@ -204,21 +199,13 @@ int main(int argc, char *argv[]) {
                 case ALLEGRO_KEY_ESCAPE:
                     keys[ESCAPE] = true;
                     break;
-                case ALLEGRO_KEY_UP:
-                    keys[UP] = true;
-                    break;
-                case ALLEGRO_KEY_DOWN:
-                    keys[DOWN] = true;
-                    break;
                 case ALLEGRO_KEY_LEFT:
                     keys[LEFT] = true;
                     break;
                 case ALLEGRO_KEY_RIGHT:
                     keys[RIGHT] = true;
                     break;
-                case ALLEGRO_KEY_SPACE:
-                    keys[SPACE] = true;
-                    break;
+
                 
             }
         }else if(event.type == ALLEGRO_EVENT_KEY_UP){
