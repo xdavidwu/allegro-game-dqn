@@ -1,26 +1,24 @@
 //
 //  main.cpp
 //  Allegro Game 
-//  Using Allegro API and OpenMP 
+//  Using Allegro 5 
 //
 //  Created by Kerwin Tsai on 15/11/2018.
 //  Copyright © 2018 Kerwin Tsai. All rights reserved.
 //
-#include<stdio.h>
-#include<omp.h>
-#include<math.h>
+#include <stdio.h>
+#include <math.h>
 #include "sys/types.h"
 #include "sys/sysinfo.h"
-#include<allegro5/allegro.h>
-#include<allegro5/allegro_primitives.h>              
-#include<allegro5/allegro_audio.h>
-#include<allegro5/allegro_color.h>
-#include<allegro5/allegro_ttf.h>    
-#include<allegro5/allegro_acodec.h>
-#include<allegro5/allegro_image.h>
-#include<allegro5/allegro_native_dialog.h>
-#include<omp.h>
-#include"object.h"
+#include <allegro5/allegro.h>
+#include <allegro5/allegro_primitives.h>              
+#include <allegro5/allegro_audio.h>
+#include <allegro5/allegro_color.h>
+#include <allegro5/allegro_ttf.h>    
+#include <allegro5/allegro_acodec.h>
+#include <allegro5/allegro_image.h>
+#include <allegro5/allegro_native_dialog.h>
+#include "object.h"
 
 #define GAME_TERMINATE 666
 #define NUMBER_BULLETS 10
@@ -150,8 +148,6 @@ int main(int argc, char *argv[]) {
     
     al_start_timer(timerfps);
     GameTime = al_current_time(); 
-    #pragma omp parallel
-    #pragma omp parallel while
     while(!Done){       
         al_wait_for_event(event_queue,&event);
 
@@ -313,7 +309,6 @@ void DrawBullet(Bullet bullet[],int size){
     }
 }
 void FireBullet(Bullet bullet[],int size,SpaceShip &ship){
-     #pragma omp parallel for
     for(unsigned int i = 0;i < size; i++){
         if(!bullet[i].live){
             bullet[i].x = ship.x;
@@ -334,7 +329,6 @@ void UpdateBullet(Bullet bullet[],int size){
     }
 }
 void CollideBullet(Bullet bullet[],int bSize,Comet comets[],int cSize, SpaceShip &ship){
-    #pragma omp parallel for
     for(unsigned int i = 0; i < bSize; i++){
         if(bullet[i].live){
             for(int j = 0; j < cSize; j++){
@@ -393,7 +387,6 @@ void UpdateComet(Comet comets[],int size){
     }
 }
 void CollideComet(Comet comets[],int cSize,SpaceShip &ship){
-    #pragma omp parallel for
     for(unsigned int i=0;i<cSize;i++){
         if(comets[i].live){
             if(comets[i].x+comets[i].boundx>ship.x-ship.boundx&&
