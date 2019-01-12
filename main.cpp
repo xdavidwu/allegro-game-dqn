@@ -287,8 +287,8 @@ void InitShip(SpaceShip &ship){
     ship.ID = PLAYER;
     ship.lives = 12;
     ship.speed = 5.46;
-    ship.boundx = 7;
-    ship.boundy = 6;
+    ship.boundx = ImageWidth/2-2;
+    ship.boundy = ImageHeight/2 - ImageHeight/3;
     ship.score = 0;
 }
 void DrawShip(SpaceShip &ship){
