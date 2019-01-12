@@ -96,9 +96,19 @@ unsigned char *getbitmap(){
     unsigned char *map=(unsigned char *)malloc(sizeof(unsigned char)*SCALED_WIDTH*SCALED_HEIGHT*3);
     for (int i=0;i<SCALED_WIDTH;i++) for(int j=0;j<SCALED_HEIGHT;j++){
         ALLEGRO_COLOR c=al_get_pixel(scr,i,j);
-        al_unmap_rgb(c,&map[i*SCALED_WIDTH*3+j*3],&map[i*SCALED_WIDTH*3+j*3+1],&map[i*width*3+j*3+2]);
+        al_unmap_rgb(c,&map[i*SCALED_HEIGHT*3+j*3],&map[i*SCALED_HEIGHT*3+j*3+1],&map[i*SCALED_HEIGHT*3+j*3+2]);
+        //printf("%d %d %u %u %u",i,j,map[i*SCALED_HEIGHT*3+j*3],map[i*SCALED_HEIGHT*3+j*3+1],map[i*SCALED_HEIGHT*3+j*3+2]);
     }
     return map;
+}
+
+void writeppm(unsigned char *bitmap){
+	FILE *f=fopen("test.ppm","wb");
+	fprintf(f,"P6\n%d %d\n255\n",SCALED_WIDTH,SCALED_HEIGHT);
+	for(int j=0;j<SCALED_HEIGHT;j++)for (int i=0;i<SCALED_WIDTH;i++) {
+		fwrite(&bitmap[i*SCALED_HEIGHT*3+j*3],1,3,f);
+	}
+	fclose(f);
 }
 //MAIN FUNCTION
 int main(int argc, char *argv[]) {
@@ -160,9 +170,8 @@ int main(int argc, char *argv[]) {
                 GameTime = al_current_time();
                 GameFPS = Frames;
                 Frames = 0;
-            }
+	    }
             //SHOW MEMORY
-
 
             //GAME STATE
             if(state == PLAYING){
@@ -237,7 +246,11 @@ int main(int argc, char *argv[]) {
             }
 
             al_flip_display();
-            al_clear_to_color(al_map_rgb(0,0,0));
+	    //if(al_current_time() - GameTime >= 1){
+		//writeppm(getbitmap());
+		//return 0;
+	    //}
+	    al_clear_to_color(al_map_rgb(0,0,0));
         }
     }
 
