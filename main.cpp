@@ -8,8 +8,6 @@
 //
 #include <stdio.h>
 #include <math.h>
-#include "sys/types.h"
-#include "sys/sysinfo.h"
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_primitives.h>              
 #include <allegro5/allegro_audio.h>
@@ -31,7 +29,12 @@
 #define SCALED_HEIGHT (height/SCALE_FACTOR)
 #define FPS 6000
 
+float epsilon=1.0;
 
+extern void dqnagent_pushmem(unsigned char*s,int a,int r,unsigned char *sp,int isterm);
+extern void dqnagent_init();
+extern int dqnagent_getact(unsigned char *s);
+extern void dqnagent_train();
 
 int pos_x, pos_y; // The position of rectangle's left-up corner.
 bool redraw = true;
@@ -112,6 +115,7 @@ void writeppm(unsigned char *bitmap){
 }
 //MAIN FUNCTION
 int main(int argc, char *argv[]) {
+    dqnagent_init();
     printf("[%s:%s] \n",__FILE__,__DATE__);
     printf("Game Start\n");
     float GameTime = 0;
@@ -157,6 +161,9 @@ int main(int argc, char *argv[]) {
         
     al_start_timer(timerfps);
     GameTime = al_current_time();
+    unsigned char *s,*sp;
+    int act;
+    int oscore=0,olife=ship.lives;
    int totalf=0; 
     while(!Done){       
         al_wait_for_event(event_queue,&event);
@@ -175,7 +182,16 @@ int main(int argc, char *argv[]) {
 		printf("Score: %d HP: %d\n",ship.score,ship.lives);
 	    }
             if(!((totalf>>3)&0x1)){ //16f
-		    int act=rand()%3;
+		    sp=getbitmap();
+		    if(s!=NULL){
+			    dqnagent_pushmem(s,act,(ship.score-oscore)+(olife-ship.lives),sp,0);
+			    dqnagent_train();
+			    free(s);
+		    }
+		    s=sp;
+		    act=dqnagent_getact(s);
+		    oscore=ship.score;
+		    olife=ship.lives;
 		    if(act==0){
 			    left=false;
 			    right=false;
@@ -210,11 +226,23 @@ int main(int argc, char *argv[]) {
                     CollideComet(comets, NUMBER_COMET, ship);
                 }
             }else if(state == GAMEOVER){
-		    printf("Alive for %d frames. Score: %d\n",totalf,ship.score);
+		    printf("Alive for %d frames. Score: %d Eps: %f\n",totalf,ship.score,epsilon);
+		    epsilon*=0.9;
+		    if(s!=NULL){
+			    sp=getbitmap();
+			    dqnagent_pushmem(s,act,(ship.score-oscore)+(olife-ship.lives),sp,0);
+			    dqnagent_train();
+			    free(s);
+			    free(sp);
+		    }
 		    totalf=0;
+		    s=NULL;
+		    sp=NULL;
 		    InitShip(ship);
 		    InitBullet(bullet,NUMBER_BULLETS);
 		    InitComet(comets,NUMBER_COMET);
+		    oscore=0;
+		    olife=ship.lives;
 		    state=PLAYING;
             }
         }else if(event.type == ALLEGRO_EVENT_DISPLAY_CLOSE){
